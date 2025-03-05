@@ -3,7 +3,7 @@
         "Sample1": {
             "MethodA": {
                 "GeneA": {
-                    "TSS1": "figures/human/sample1/geneA.png",
+                    "TSS1": "figures/human/ReCap/sample1/geneA.png",
                     "TSS2": "figures/Human_Sample1_MethodA_GeneA_TSS2.png"
                 },
                 "GeneB": {
