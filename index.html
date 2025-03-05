@@ -25,11 +25,16 @@
     </style>
 </head>
 <body>
-    <h2>Select Sample, Method, Gene, and TSS</h2>
+    <h2>Select Species, Sample, Method, Gene, and TSS</h2>
     
     <div id="filters">
+        <label for="species-selector">Species:</label>
+        <select id="species-selector">
+            <option value="">Select Species</option>
+        </select>
+
         <label for="sample-selector">Sample:</label>
-        <select id="sample-selector">
+        <select id="sample-selector" disabled>
             <option value="">Select Sample</option>
         </select>
 
@@ -55,8 +60,8 @@
     </div>
 
     <script>
-        const repoOwner = "jhfoxliu";  // Change to your GitHub username
-        const repoName = "tss_demo";       // Change to your repository name
+        const repoOwner = "your-username";  // Change to your GitHub username
+        const repoName = "your-repo";       // Change to your repository name
         const jsonURL = `https://${repoOwner}.github.io/${repoName}/figures.json`;  // Hosted JSON file
 
         let figureData = {};
@@ -66,33 +71,53 @@
                 const response = await fetch(jsonURL);
                 if (!response.ok) throw new Error("Failed to fetch JSON");
                 figureData = await response.json();
-                populateSampleSelector();
+                populateSpeciesSelector();
             } catch (error) {
                 console.error("Error loading JSON:", error);
             }
         }
 
+        function populateSpeciesSelector() {
+            const speciesSelector = document.getElementById("species-selector");
+            speciesSelector.innerHTML = '<option value="">Select Species</option>'; // Reset
+            
+            Object.keys(figureData).forEach(species => {
+                let option = document.createElement("option");
+                option.value = species;
+                option.textContent = species;
+                speciesSelector.appendChild(option);
+            });
+
+            disableSelectors(["sample-selector", "method-selector", "gene-selector", "tss-selector"]);
+        }
+
         function populateSampleSelector() {
+            const species = document.getElementById("species-selector").value;
             const sampleSelector = document.getElementById("sample-selector");
             sampleSelector.innerHTML = '<option value="">Select Sample</option>'; // Reset
             
-            Object.keys(figureData).forEach(sample => {
-                let option = document.createElement("option");
-                option.value = sample;
-                option.textContent = sample;
-                sampleSelector.appendChild(option);
-            });
+            if (species && figureData[species]) {
+                Object.keys(figureData[species]).forEach(sample => {
+                    let option = document.createElement("option");
+                    option.value = sample;
+                    option.textContent = sample;
+                    sampleSelector.appendChild(option);
+                });
 
-            disableSelectors(["method-selector", "gene-selector", "tss-selector"]);
+                sampleSelector.disabled = false;
+            } else {
+                disableSelectors(["sample-selector", "method-selector", "gene-selector", "tss-selector"]);
+            }
         }
 
         function populateMethodSelector() {
+            const species = document.getElementById("species-selector").value;
             const sample = document.getElementById("sample-selector").value;
             const methodSelector = document.getElementById("method-selector");
             methodSelector.innerHTML = '<option value="">Select Method</option>'; // Reset
             
-            if (sample && figureData[sample]) {
-                Object.keys(figureData[sample]).forEach(method => {
+            if (species && sample && figureData[species] && figureData[species][sample]) {
+                Object.keys(figureData[species][sample]).forEach(method => {
                     let option = document.createElement("option");
                     option.value = method;
                     option.textContent = method;
@@ -106,13 +131,14 @@
         }
 
         function populateGeneSelector() {
+            const species = document.getElementById("species-selector").value;
             const sample = document.getElementById("sample-selector").value;
             const method = document.getElementById("method-selector").value;
             const geneSelector = document.getElementById("gene-selector");
             geneSelector.innerHTML = '<option value="">Select Gene</option>'; // Reset
             
-            if (sample && method && figureData[sample] && figureData[sample][method]) {
-                Object.keys(figureData[sample][method]).forEach(gene => {
+            if (species && sample && method && figureData[species][sample] && figureData[species][sample][method]) {
+                Object.keys(figureData[species][sample][method]).forEach(gene => {
                     let option = document.createElement("option");
                     option.value = gene;
                     option.textContent = gene;
@@ -126,14 +152,15 @@
         }
 
         function populateTSSSelector() {
+            const species = document.getElementById("species-selector").value;
             const sample = document.getElementById("sample-selector").value;
             const method = document.getElementById("method-selector").value;
             const gene = document.getElementById("gene-selector").value;
             const tssSelector = document.getElementById("tss-selector");
             tssSelector.innerHTML = '<option value="">Select TSS</option>'; // Reset
             
-            if (sample && method && gene && figureData[sample][method] && figureData[sample][method][gene]) {
-                Object.keys(figureData[sample][method][gene]).forEach(tss => {
+            if (species && sample && method && gene && figureData[species][sample][method] && figureData[species][sample][method][gene]) {
+                Object.keys(figureData[species][sample][method][gene]).forEach(tss => {
                     let option = document.createElement("option");
                     option.value = tss;
                     option.textContent = tss;
@@ -147,14 +174,15 @@
         }
 
         function updateFigure() {
+            const species = document.getElementById("species-selector").value;
             const sample = document.getElementById("sample-selector").value;
             const method = document.getElementById("method-selector").value;
             const gene = document.getElementById("gene-selector").value;
             const tss = document.getElementById("tss-selector").value;
             const figure = document.getElementById("figure");
 
-            if (sample && method && gene && tss && figureData[sample][method][gene][tss]) {
-                figure.src = `https://${repoOwner}.github.io/${repoName}/${figureData[sample][method][gene][tss]}`;
+            if (species && sample && method && gene && tss && figureData[species][sample][method][gene][tss]) {
+                figure.src = `https://${repoOwner}.github.io/${repoName}/${figureData[species][sample][method][gene][tss]}`;
             } else {
                 figure.src = "";
             }
@@ -167,24 +195,13 @@
             });
         }
 
-        document.getElementById("sample-selector").addEventListener("change", () => {
-            populateMethodSelector();
-            updateFigure();
-        });
+        fetchFigures();
 
-        document.getElementById("method-selector").addEventListener("change", () => {
-            populateGeneSelector();
-            updateFigure();
-        });
-
-        document.getElementById("gene-selector").addEventListener("change", () => {
-            populateTSSSelector();
-            updateFigure();
-        });
-
+        document.getElementById("species-selector").addEventListener("change", populateSampleSelector);
+        document.getElementById("sample-selector").addEventListener("change", populateMethodSelector);
+        document.getElementById("method-selector").addEventListener("change", populateGeneSelector);
+        document.getElementById("gene-selector").addEventListener("change", populateTSSSelector);
         document.getElementById("tss-selector").addEventListener("change", updateFigure);
-
-        fetchFigures(); // Load figure data
     </script>
 </body>
 </html>
