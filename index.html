@@ -62,8 +62,8 @@
     <script>
         const repoOwner = "jhfoxliu";  // Change to your GitHub username
         const repoName = "tss_demo";   // Change to your repository name
-        const jsonURL = `https://${repoOwner}.github.io/${repoName}/figures.json`;  // Hosted JSON file
-        const baseURL = `https://${repoOwner}.github.io/${repoName}/`;  // Base URL for images
+        const jsonURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/figures.json`;  // Hosted JSON file
+        const baseURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/figures/`;  // Base URL for images
 
         let figureData = {};
 
@@ -175,15 +175,16 @@
         }
 
         function updateFigure() {
-            const species = document.getElementById("species-selector").value;
+            const species = document.getElementById("species-selector").value.toLowerCase(); // Convert to match directory case
             const sample = document.getElementById("sample-selector").value;
             const method = document.getElementById("method-selector").value;
-            const gene = document.getElementById("gene-selector").value;
+            const gene = document.getElementById("gene-selector").value.toLowerCase(); // Convert for consistency
             const tss = document.getElementById("tss-selector").value;
             const figure = document.getElementById("figure");
 
             if (species && sample && method && gene && tss) {
-                figure.src = baseURL + figureData[species][sample][method][gene][tss];
+                const imagePath = `${baseURL}${species}/${method}/${sample}/${gene}/${tss}.png`;
+                figure.src = imagePath;
             } else {
                 figure.src = "";
             }
