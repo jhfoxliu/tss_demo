@@ -183,7 +183,7 @@
             const figure = document.getElementById("figure");
 
             if (species && sample && method && gene && tss) {
-                const imagePath = `${baseURL}${species}/${method}/${sample}/${gene}/${tss}.png`;
+                const imagePath = `${baseURL}${species}/${sample}/${method}/${gene}/${tss}.png`;
                 figure.src = imagePath;
             } else {
                 figure.src = "";
