@@ -175,15 +175,15 @@
         }
 
         function updateFigure() {
-            const species = document.getElementById("species-selector").value.toLowerCase(); // Convert to match directory case
+            const species = document.getElementById("species-selector").value; // Convert to match directory case .toLowerCase()
             const sample = document.getElementById("sample-selector").value;
             const method = document.getElementById("method-selector").value;
-            const gene = document.getElementById("gene-selector").value.toLowerCase(); // Convert for consistency
+            const gene = document.getElementById("gene-selector").value; // Convert for consistency .toLowerCase()
             const tss = document.getElementById("tss-selector").value;
             const figure = document.getElementById("figure");
 
             if (species && sample && method && gene && tss) {
-                const imagePath = `${baseURL}${species}/${method}/${sample}/${gene}/${tss}.png`;
+                const imagePath = `${baseURL}${species}/${sample}/${method}/${gene}/${tss}.png`;
                 figure.src = imagePath;
             } else {
                 figure.src = "";

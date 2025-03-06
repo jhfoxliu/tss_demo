@@ -29,29 +29,19 @@
     
     <div id="filters">
         <label for="species-selector">Species:</label>
-        <select id="species-selector">
-            <option value="">Select Species</option>
-        </select>
+        <select id="species-selector"></select>
 
         <label for="sample-selector">Sample:</label>
-        <select id="sample-selector" disabled>
-            <option value="">Select Sample</option>
-        </select>
+        <select id="sample-selector" disabled></select>
 
         <label for="method-selector">Method:</label>
-        <select id="method-selector" disabled>
-            <option value="">Select Method</option>
-        </select>
+        <select id="method-selector" disabled></select>
 
         <label for="gene-selector">Gene:</label>
-        <select id="gene-selector" disabled>
-            <option value="">Select Gene</option>
-        </select>
+        <select id="gene-selector" disabled></select>
 
         <label for="tss-selector">TSS:</label>
-        <select id="tss-selector" disabled>
-            <option value="">Select TSS</option>
-        </select>
+        <select id="tss-selector" disabled></select>
     </div>
 
     <h3>Selected Figure</h3>
@@ -60,10 +50,10 @@
     </div>
 
     <script>
-        const repoOwner = "jhfoxliu";  // Change to your GitHub username
-        const repoName = "tss_demo";   // Change to your repository name
-        const jsonURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/figures.json`;  // Hosted JSON file
-        const baseURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/refs/heads/main/figures/`;  // Base URL for images
+        const repoOwner = "jhfoxliu";  
+        const repoName = "tss_demo";   
+        const jsonURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/figures.json`;
+        const baseURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/refs/heads/main/figures/`;
 
         let figureData = {};
 
@@ -78,56 +68,53 @@
             }
         }
 
-        function populateSpeciesSelector() {
-            const speciesSelector = document.getElementById("species-selector");
-            speciesSelector.innerHTML = '<option value="">Select Species</option>';
+        function populateSelector(selectorId, options) {
+            const selector = document.getElementById(selectorId);
+            selector.innerHTML = "";
             
-            Object.keys(figureData).forEach(species => {
-                let option = document.createElement("option");
-                option.value = species;
-                option.textContent = species;
-                speciesSelector.appendChild(option);
+            options.forEach((option, index) => {
+                let opt = document.createElement("option");
+                opt.value = option;
+                opt.textContent = option;
+                selector.appendChild(opt);
+
+                // Auto-select the first available option
+                if (index === 0) selector.value = option;
             });
 
-            disableSelectors(["sample-selector", "method-selector", "gene-selector", "tss-selector"]);
+            selector.disabled = false;
+        }
+
+        function populateSpeciesSelector() {
+            const speciesSelector = document.getElementById("species-selector");
+            const speciesList = Object.keys(figureData);
+
+            if (speciesList.length > 0) {
+                populateSelector("species-selector", speciesList);
+                populateSampleSelector();
+            }
         }
 
         function populateSampleSelector() {
             const species = document.getElementById("species-selector").value;
-            const sampleSelector = document.getElementById("sample-selector");
-            sampleSelector.innerHTML = '<option value="">Select Sample</option>';
-            
-            if (species && figureData[species]) {
-                Object.keys(figureData[species]).forEach(sample => {
-                    let option = document.createElement("option");
-                    option.value = sample;
-                    option.textContent = sample;
-                    sampleSelector.appendChild(option);
-                });
+            if (!species) return;
 
-                sampleSelector.disabled = false;
-            } else {
-                disableSelectors(["sample-selector", "method-selector", "gene-selector", "tss-selector"]);
+            const sampleList = Object.keys(figureData[species]);
+            if (sampleList.length > 0) {
+                populateSelector("sample-selector", sampleList);
+                populateMethodSelector();
             }
         }
 
         function populateMethodSelector() {
             const species = document.getElementById("species-selector").value;
             const sample = document.getElementById("sample-selector").value;
-            const methodSelector = document.getElementById("method-selector");
-            methodSelector.innerHTML = '<option value="">Select Method</option>';
-            
-            if (species && sample && figureData[species][sample]) {
-                Object.keys(figureData[species][sample]).forEach(method => {
-                    let option = document.createElement("option");
-                    option.value = method;
-                    option.textContent = method;
-                    methodSelector.appendChild(option);
-                });
+            if (!species || !sample) return;
 
-                methodSelector.disabled = false;
-            } else {
-                disableSelectors(["method-selector", "gene-selector", "tss-selector"]);
+            const methodList = Object.keys(figureData[species][sample]);
+            if (methodList.length > 0) {
+                populateSelector("method-selector", methodList);
+                populateGeneSelector();
             }
         }
 
@@ -135,20 +122,12 @@
             const species = document.getElementById("species-selector").value;
             const sample = document.getElementById("sample-selector").value;
             const method = document.getElementById("method-selector").value;
-            const geneSelector = document.getElementById("gene-selector");
-            geneSelector.innerHTML = '<option value="">Select Gene</option>';
-            
-            if (species && sample && method && figureData[species][sample][method]) {
-                Object.keys(figureData[species][sample][method]).forEach(gene => {
-                    let option = document.createElement("option");
-                    option.value = gene;
-                    option.textContent = gene;
-                    geneSelector.appendChild(option);
-                });
+            if (!species || !sample || !method) return;
 
-                geneSelector.disabled = false;
-            } else {
-                disableSelectors(["gene-selector", "tss-selector"]);
+            const geneList = Object.keys(figureData[species][sample][method]);
+            if (geneList.length > 0) {
+                populateSelector("gene-selector", geneList);
+                populateTSSSelector();
             }
         }
 
@@ -157,45 +136,39 @@
             const sample = document.getElementById("sample-selector").value;
             const method = document.getElementById("method-selector").value;
             const gene = document.getElementById("gene-selector").value;
-            const tssSelector = document.getElementById("tss-selector");
-            tssSelector.innerHTML = '<option value="">Select TSS</option>';
-            
-            if (species && sample && method && gene && figureData[species][sample][method][gene]) {
-                Object.keys(figureData[species][sample][method][gene]).forEach(tss => {
-                    let option = document.createElement("option");
-                    option.value = tss;
-                    option.textContent = tss;
-                    tssSelector.appendChild(option);
-                });
+            if (!species || !sample || !method || !gene) return;
 
-                tssSelector.disabled = false;
-            } else {
-                disableSelectors(["tss-selector"]);
+            const tssList = Object.keys(figureData[species][sample][method][gene]);
+            if (tssList.length > 0) {
+                populateSelector("tss-selector", tssList);
+                updateFigure();
             }
         }
 
         function updateFigure() {
-            const species = document.getElementById("species-selector").value; // Convert to match directory case .toLowerCase()
+            const species = document.getElementById("species-selector").value;
             const sample = document.getElementById("sample-selector").value;
             const method = document.getElementById("method-selector").value;
-            const gene = document.getElementById("gene-selector").value; // Convert for consistency .toLowerCase()
+            const gene = document.getElementById("gene-selector").value;
             const tss = document.getElementById("tss-selector").value;
             const figure = document.getElementById("figure");
 
             if (species && sample && method && gene && tss) {
                 const imagePath = `${baseURL}${species}/${sample}/${method}/${gene}/${tss}.png`;
+                console.log("Generated Image Path:", imagePath); // Debugging output
                 figure.src = imagePath;
             } else {
                 figure.src = "";
             }
         }
 
-        fetchFigures();
         document.getElementById("species-selector").addEventListener("change", populateSampleSelector);
         document.getElementById("sample-selector").addEventListener("change", populateMethodSelector);
         document.getElementById("method-selector").addEventListener("change", populateGeneSelector);
         document.getElementById("gene-selector").addEventListener("change", populateTSSSelector);
         document.getElementById("tss-selector").addEventListener("change", updateFigure);
+
+        fetchFigures();
     </script>
 </body>
 </html>
