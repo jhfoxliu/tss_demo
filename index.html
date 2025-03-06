@@ -20,18 +20,40 @@
             width: 45%;
             text-align: center;
         }
-        select {
+        select, input {
             margin: 5px;
             padding: 5px;
         }
-        img {
-            width: 100%; /* Ensures images fill the container */
-            max-width: 400px; /* Prevents images from exceeding this width */
-            height: 300px; /* Fixed height to prevent shifting */
-            object-fit: contain; /* Ensures images maintain aspect ratio */
-            border: 1px solid #ddd; /* Optional: Adds a border for consistency */
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .dropdown-list {
+            position: absolute;
+            z-index: 1000;
+            width: 100%;
+            border: 1px solid #ccc;
+            background: white;
+            display: none;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .dropdown-list div {
             padding: 5px;
-            background: #f8f8f8; /* Light background for contrast */
+            cursor: pointer;
+        }
+        .dropdown-list div:hover {
+            background-color: #ddd;
+        }
+        img {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            padding: 5px;
+            background: #f8f8f8;
         }
     </style>
 </head>
@@ -50,7 +72,10 @@
                 <select id="sample-selector-left" disabled></select>
 
                 <label for="gene-selector-left">Gene:</label>
-                <select id="gene-selector-left" disabled></select>
+                <div class="dropdown-container">
+                    <input type="text" id="gene-input-left" placeholder="Type to search..." disabled>
+                    <div class="dropdown-list" id="gene-dropdown-left"></div>
+                </div>
 
                 <label for="tss-selector-left">TSS:</label>
                 <select id="tss-selector-left" disabled></select>
@@ -69,7 +94,10 @@
                 <select id="sample-selector-right" disabled></select>
 
                 <label for="gene-selector-right">Gene:</label>
-                <select id="gene-selector-right" disabled></select>
+                <div class="dropdown-container">
+                    <input type="text" id="gene-input-right" placeholder="Type to search..." disabled>
+                    <div class="dropdown-list" id="gene-dropdown-right"></div>
+                </div>
 
                 <label for="tss-selector-right">TSS:</label>
                 <select id="tss-selector-right" disabled></select>
@@ -108,7 +136,6 @@
                 opt.textContent = option;
                 selector.appendChild(opt);
 
-                // Auto-select the first available option
                 if (index === 0) selector.value = option;
             });
 
@@ -116,11 +143,9 @@
         }
 
         function populateSpeciesSelector(panel) {
-            const selectorId = `species-selector-${panel}`;
             const speciesList = Object.keys(figureData);
-
             if (speciesList.length > 0) {
-                populateSelector(selectorId, speciesList);
+                populateSelector(`species-selector-${panel}`, speciesList);
                 populateSampleSelector(panel);
             }
         }
@@ -142,29 +167,50 @@
             if (!species || !sample) return;
 
             const geneList = Object.keys(figureData[species][sample]);
-            if (geneList.length > 0) {
-                populateSelector(`gene-selector-${panel}`, geneList);
-                populateTSSSelector(panel);
-            }
+            const inputField = document.getElementById(`gene-input-${panel}`);
+            const dropdown = document.getElementById(`gene-dropdown-${panel}`);
+
+            inputField.disabled = false;
+            inputField.value = geneList.length > 0 ? geneList[0] : "";  // Set first gene as placeholder
+
+            inputField.addEventListener("input", function () {
+                const searchText = inputField.value.toLowerCase();
+                dropdown.innerHTML = "";
+
+                geneList.forEach(gene => {
+                    if (gene.toLowerCase().includes(searchText)) {
+                        const option = document.createElement("div");
+                        option.textContent = gene;
+                        option.addEventListener("click", () => {
+                            inputField.value = gene;
+                            dropdown.style.display = "none";
+                            populateTSSSelector(panel);
+                        });
+                        dropdown.appendChild(option);
+                    }
+                });
+
+                dropdown.style.display = dropdown.innerHTML ? "block" : "none";
+            });
+
+            populateTSSSelector(panel);
         }
 
         function populateTSSSelector(panel) {
             const species = document.getElementById(`species-selector-${panel}`).value;
             const sample = document.getElementById(`sample-selector-${panel}`).value;
-            const gene = document.getElementById(`gene-selector-${panel}`).value;
+            const gene = document.getElementById(`gene-input-${panel}`).value;
             if (!species || !sample || !gene) return;
 
             const tssList = Object.keys(figureData[species][sample][gene]);
-            if (tssList.length > 0) {
-                populateSelector(`tss-selector-${panel}`, tssList);
-                updateFigure(panel);
-            }
+            populateSelector(`tss-selector-${panel}`, tssList);
+            updateFigure(panel);
         }
 
         function updateFigure(panel) {
             const species = document.getElementById(`species-selector-${panel}`).value;
             const sample = document.getElementById(`sample-selector-${panel}`).value;
-            const gene = document.getElementById(`gene-selector-${panel}`).value;
+            const gene = document.getElementById(`gene-input-${panel}`).value;
             const tss = document.getElementById(`tss-selector-${panel}`).value;
             const figure = document.getElementById(`figure-${panel}`);
 
@@ -176,16 +222,6 @@
                 figure.src = "";
             }
         }
-
-        document.getElementById("species-selector-left").addEventListener("change", () => populateSampleSelector("left"));
-        document.getElementById("sample-selector-left").addEventListener("change", () => populateGeneSelector("left"));
-        document.getElementById("gene-selector-left").addEventListener("change", () => populateTSSSelector("left"));
-        document.getElementById("tss-selector-left").addEventListener("change", () => updateFigure("left"));
-
-        document.getElementById("species-selector-right").addEventListener("change", () => populateSampleSelector("right"));
-        document.getElementById("sample-selector-right").addEventListener("change", () => populateGeneSelector("right"));
-        document.getElementById("gene-selector-right").addEventListener("change", () => populateTSSSelector("right"));
-        document.getElementById("tss-selector-right").addEventListener("change", () => updateFigure("right"));
 
         fetchFigures();
     </script>
