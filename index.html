@@ -71,16 +71,13 @@
                 <label for="sample-selector-left">Sample:</label>
                 <select id="sample-selector-left" disabled></select>
 
-                <label for="gene-selector-left">Gene:</label>
+                <label for="gene-selector-left">Gene:TSS</label>
                 <div class="dropdown-container">
                     <input type="text" id="gene-input-left" placeholder="Type to search..." disabled>
                     <div class="dropdown-list" id="gene-dropdown-left"></div>
                 </div>
-
-                <label for="tss-selector-left">TSS:</label>
-                <select id="tss-selector-left" disabled></select>
             </div>
-            <img id="figure-left" src="" alt="Left Selected Figure">
+            <img id="figure-left" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Left Selected Figure">
         </div>
 
         <!-- Right Panel -->
@@ -93,16 +90,13 @@
                 <label for="sample-selector-right">Sample:</label>
                 <select id="sample-selector-right" disabled></select>
 
-                <label for="gene-selector-right">Gene:</label>
+                <label for="gene-selector-right">Gene:TSS</label>
                 <div class="dropdown-container">
                     <input type="text" id="gene-input-right" placeholder="Type to search..." disabled>
                     <div class="dropdown-list" id="gene-dropdown-right"></div>
                 </div>
-
-                <label for="tss-selector-right">TSS:</label>
-                <select id="tss-selector-right" disabled></select>
             </div>
-            <img id="figure-right" src="" alt="Right Selected Figure">
+            <img id="figure-right" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Right Selected Figure">
         </div>
     </div>
 
@@ -110,7 +104,7 @@
         const repoOwner = "jhfoxliu";  
         const repoName = "tss_demo";   
         const jsonURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/figures.json`;
-        const baseURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/refs/heads/main/figures/`;
+        const baseURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/refs/heads/main/`;
 
         let figureData = {};
 
@@ -171,20 +165,20 @@
             const dropdown = document.getElementById(`gene-dropdown-${panel}`);
 
             inputField.disabled = false;
-            inputField.value = geneList.length > 0 ? geneList[0] : "";  // Set first gene as placeholder
+            inputField.value = geneList.length > 0 ? geneList[0] : "";  // Set first Gene:TSS as placeholder
 
             inputField.addEventListener("input", function () {
                 const searchText = inputField.value.toLowerCase();
                 dropdown.innerHTML = "";
 
-                geneList.forEach(gene => {
-                    if (gene.toLowerCase().includes(searchText)) {
+                geneList.forEach(geneTSS => {
+                    if (geneTSS.toLowerCase().includes(searchText)) {
                         const option = document.createElement("div");
-                        option.textContent = gene;
+                        option.textContent = geneTSS;
                         option.addEventListener("click", () => {
-                            inputField.value = gene;
+                            inputField.value = geneTSS;
                             dropdown.style.display = "none";
-                            populateTSSSelector(panel);
+                            updateFigure(panel);
                         });
                         dropdown.appendChild(option);
                     }
@@ -193,29 +187,17 @@
                 dropdown.style.display = dropdown.innerHTML ? "block" : "none";
             });
 
-            populateTSSSelector(panel);
-        }
-
-        function populateTSSSelector(panel) {
-            const species = document.getElementById(`species-selector-${panel}`).value;
-            const sample = document.getElementById(`sample-selector-${panel}`).value;
-            const gene = document.getElementById(`gene-input-${panel}`).value;
-            if (!species || !sample || !gene) return;
-
-            const tssList = Object.keys(figureData[species][sample][gene]);
-            populateSelector(`tss-selector-${panel}`, tssList);
             updateFigure(panel);
         }
 
         function updateFigure(panel) {
             const species = document.getElementById(`species-selector-${panel}`).value;
             const sample = document.getElementById(`sample-selector-${panel}`).value;
-            const gene = document.getElementById(`gene-input-${panel}`).value;
-            const tss = document.getElementById(`tss-selector-${panel}`).value;
+            const geneTSS = document.getElementById(`gene-input-${panel}`).value;
             const figure = document.getElementById(`figure-${panel}`);
 
-            if (species && sample && gene && tss) {
-                const imagePath = `${baseURL}${species}/${sample}/${gene}/${tss}.png`;
+            if (species && sample && geneTSS && figureData[species][sample][geneTSS]) {
+                const imagePath = `${baseURL}${figureData[species][sample][geneTSS]}`;
                 console.log(`Generated Image Path (${panel}):`, imagePath);
                 figure.src = imagePath;
             } else {
