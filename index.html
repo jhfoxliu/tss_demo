@@ -30,7 +30,7 @@
         .dropdown-container {
             position: relative;
             display: inline-block;
-            width: 250px; /* Fixed width for search box */
+            width: 250px;
         }
         .dropdown-list {
             position: absolute;
@@ -61,12 +61,12 @@
     </style>
 </head>
 <body>
-    <h2>RNA 5' expansion browser</h2>
+    <h2>Select and Compare Two Figures</h2>
 
     <div class="container">
         <!-- Left Panel -->
         <div class="panel">
-            <h3>TSS-1</h3>
+            <h3>Left Selection</h3>
             <div class="selectors">
                 <label for="species-selector-left">Species:</label>
                 <select id="species-selector-left"></select>
@@ -83,12 +83,12 @@
                 </div>
             </div>
 
-            <img id="figure-left" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Left Selected Figure">
+            <img id="figure-left" src="" alt="Left Selected Figure">
         </div>
 
         <!-- Right Panel -->
         <div class="panel">
-            <h3>TSS-2</h3>
+            <h3>Right Selection</h3>
             <div class="selectors">
                 <label for="species-selector-right">Species:</label>
                 <select id="species-selector-right"></select>
@@ -105,7 +105,7 @@
                 </div>
             </div>
 
-            <img id="figure-right" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Right Selected Figure">
+            <img id="figure-right" src="" alt="Right Selected Figure">
         </div>
     </div>
 
@@ -155,12 +155,16 @@
 
         function populateSampleSelector(panel) {
             const species = document.getElementById(`species-selector-${panel}`).value;
+            const sampleSelector = document.getElementById(`sample-selector-${panel}`);
             if (!species) return;
 
             const sampleList = Object.keys(figureData[species]);
             if (sampleList.length > 0) {
                 populateSelector(`sample-selector-${panel}`, sampleList);
                 populateGeneSelector(panel);
+            } else {
+                sampleSelector.innerHTML = "";
+                document.getElementById(`gene-input-${panel}`).disabled = true;
             }
         }
 
@@ -213,6 +217,19 @@
                 figure.src = "";
             }
         }
+
+        document.getElementById("species-selector-left").addEventListener("change", () => {
+            populateSampleSelector("left");
+            document.getElementById("gene-input-left").disabled = true;
+        });
+
+        document.getElementById("species-selector-right").addEventListener("change", () => {
+            populateSampleSelector("right");
+            document.getElementById("gene-input-right").disabled = true;
+        });
+
+        document.getElementById("sample-selector-left").addEventListener("change", () => populateGeneSelector("left"));
+        document.getElementById("sample-selector-right").addEventListener("change", () => populateGeneSelector("right"));
 
         fetchFigures();
     </script>

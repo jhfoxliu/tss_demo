@@ -13,12 +13,15 @@
         .container {
             display: flex;
             justify-content: space-around;
-            align-items: center;
+            align-items: flex-start;
             flex-wrap: wrap;
         }
         .panel {
             width: 45%;
             text-align: center;
+        }
+        .selectors {
+            margin-bottom: 15px;
         }
         select, input {
             margin: 5px;
@@ -27,7 +30,7 @@
         .dropdown-container {
             position: relative;
             display: inline-block;
-            width: 100%;
+            width: 250px; /* Fixed width for search box */
         }
         .dropdown-list {
             position: absolute;
@@ -58,44 +61,50 @@
     </style>
 </head>
 <body>
-    <h2>Select and Compare Two Figures</h2>
+    <h2>RNA 5' expansion browser</h2>
 
     <div class="container">
         <!-- Left Panel -->
         <div class="panel">
-            <h3>Left Selection</h3>
-            <div class="filters">
+            <h3>TSS-1</h3>
+            <div class="selectors">
                 <label for="species-selector-left">Species:</label>
                 <select id="species-selector-left"></select>
 
                 <label for="sample-selector-left">Sample:</label>
                 <select id="sample-selector-left" disabled></select>
+            </div>
 
-                <label for="gene-selector-left">Gene:TSS</label>
+            <div class="selectors">
+                <label for="gene-input-left">Gene:TSS</label>
                 <div class="dropdown-container">
                     <input type="text" id="gene-input-left" placeholder="Type to search..." disabled>
                     <div class="dropdown-list" id="gene-dropdown-left"></div>
                 </div>
             </div>
+
             <img id="figure-left" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Left Selected Figure">
         </div>
 
         <!-- Right Panel -->
         <div class="panel">
-            <h3>Right Selection</h3>
-            <div class="filters">
+            <h3>TSS-2</h3>
+            <div class="selectors">
                 <label for="species-selector-right">Species:</label>
                 <select id="species-selector-right"></select>
 
                 <label for="sample-selector-right">Sample:</label>
                 <select id="sample-selector-right" disabled></select>
+            </div>
 
-                <label for="gene-selector-right">Gene:TSS</label>
+            <div class="selectors">
+                <label for="gene-input-right">Gene:TSS</label>
                 <div class="dropdown-container">
                     <input type="text" id="gene-input-right" placeholder="Type to search..." disabled>
                     <div class="dropdown-list" id="gene-dropdown-right"></div>
                 </div>
             </div>
+
             <img id="figure-right" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Right Selected Figure">
         </div>
     </div>
