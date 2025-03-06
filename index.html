@@ -13,7 +13,7 @@
         .container {
             display: flex;
             justify-content: space-around;
-            align-items: center;
+            align-items: flex-start;
             flex-wrap: wrap;
         }
         .panel {
@@ -27,7 +27,8 @@
         .dropdown-container {
             position: relative;
             display: inline-block;
-            width: 100%;
+            width: auto;
+            min-width: 200px;
         }
         .dropdown-list {
             position: absolute;
@@ -71,8 +72,8 @@
                 <label for="sample-selector-left">Sample:</label>
                 <select id="sample-selector-left" disabled></select>
 
-                <label for="gene-selector-left">Gene:TSS</label>
                 <div class="dropdown-container">
+                    <label for="gene-input-left">Gene:TSS</label>
                     <input type="text" id="gene-input-left" placeholder="Type to search..." disabled>
                     <div class="dropdown-list" id="gene-dropdown-left"></div>
                 </div>
@@ -90,8 +91,8 @@
                 <label for="sample-selector-right">Sample:</label>
                 <select id="sample-selector-right" disabled></select>
 
-                <label for="gene-selector-right">Gene:TSS</label>
                 <div class="dropdown-container">
+                    <label for="gene-input-right">Gene:TSS</label>
                     <input type="text" id="gene-input-right" placeholder="Type to search..." disabled>
                     <div class="dropdown-list" id="gene-dropdown-right"></div>
                 </div>
@@ -185,6 +186,9 @@
                 });
 
                 dropdown.style.display = dropdown.innerHTML ? "block" : "none";
+
+                // Adjust the width dynamically
+                inputField.style.width = Math.max(...Array.from(dropdown.children).map(el => el.offsetWidth), 200) + "px";
             });
 
             updateFigure(panel);
