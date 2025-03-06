@@ -18,15 +18,20 @@
         }
         .panel {
             width: 45%;
+            text-align: center;
         }
         select {
             margin: 5px;
             padding: 5px;
         }
         img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 20px;
+            width: 100%; /* Ensures images fill the container */
+            max-width: 400px; /* Prevents images from exceeding this width */
+            height: 300px; /* Fixed height to prevent shifting */
+            object-fit: contain; /* Ensures images maintain aspect ratio */
+            border: 1px solid #ddd; /* Optional: Adds a border for consistency */
+            padding: 5px;
+            background: #f8f8f8; /* Light background for contrast */
         }
     </style>
 </head>
