@@ -23,8 +23,27 @@
         .search-container {
             margin-bottom: 10px;
         }
+        .dropdown-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .dropdown-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         select {
-            width: 80%;
+            width: auto;
+            min-width: 150px;
+            max-width: 100%;
             padding: 5px;
             margin: 5px;
         }
@@ -46,22 +65,36 @@
         <!-- Left Panel -->
         <div class="panel">
             <h3>Left Selection</h3>
-            <div class="filters">
-                <label for="species-search-left">Search Species:</label>
-                <input type="text" id="species-search-left" placeholder="Search species...">
-                <select id="species-selector-left"></select>
+            <div class="dropdown-container">
+                <!-- First Row: Species and Sample -->
+                <div class="dropdown-row">
+                    <div class="search-group">
+                        <label for="species-search-left">Search Species:</label>
+                        <input type="text" id="species-search-left" placeholder="Search species...">
+                        <select id="species-selector-left"></select>
+                    </div>
 
-                <label for="sample-search-left">Search Sample:</label>
-                <input type="text" id="sample-search-left" placeholder="Search sample...">
-                <select id="sample-selector-left" disabled></select>
+                    <div class="search-group">
+                        <label for="sample-search-left">Search Sample:</label>
+                        <input type="text" id="sample-search-left" placeholder="Search sample...">
+                        <select id="sample-selector-left" disabled></select>
+                    </div>
+                </div>
 
-                <label for="gene-search-left">Search Gene:</label>
-                <input type="text" id="gene-search-left" placeholder="Search gene...">
-                <select id="gene-selector-left" disabled></select>
+                <!-- Second Row: Gene and TSS -->
+                <div class="dropdown-row">
+                    <div class="search-group">
+                        <label for="gene-search-left">Search Gene:</label>
+                        <input type="text" id="gene-search-left" placeholder="Search gene...">
+                        <select id="gene-selector-left" disabled></select>
+                    </div>
 
-                <label for="tss-search-left">Search TSS:</label>
-                <input type="text" id="tss-search-left" placeholder="Search TSS...">
-                <select id="tss-selector-left" disabled></select>
+                    <div class="search-group">
+                        <label for="tss-search-left">Search TSS:</label>
+                        <input type="text" id="tss-search-left" placeholder="Search TSS...">
+                        <select id="tss-selector-left" disabled></select>
+                    </div>
+                </div>
             </div>
             <img id="figure-left" src="" alt="Left Selected Figure">
         </div>
@@ -69,22 +102,36 @@
         <!-- Right Panel -->
         <div class="panel">
             <h3>Right Selection</h3>
-            <div class="filters">
-                <label for="species-search-right">Search Species:</label>
-                <input type="text" id="species-search-right" placeholder="Search species...">
-                <select id="species-selector-right"></select>
+            <div class="dropdown-container">
+                <!-- First Row: Species and Sample -->
+                <div class="dropdown-row">
+                    <div class="search-group">
+                        <label for="species-search-right">Search Species:</label>
+                        <input type="text" id="species-search-right" placeholder="Search species...">
+                        <select id="species-selector-right"></select>
+                    </div>
 
-                <label for="sample-search-right">Search Sample:</label>
-                <input type="text" id="sample-search-right" placeholder="Search sample...">
-                <select id="sample-selector-right" disabled></select>
+                    <div class="search-group">
+                        <label for="sample-search-right">Search Sample:</label>
+                        <input type="text" id="sample-search-right" placeholder="Search sample...">
+                        <select id="sample-selector-right" disabled></select>
+                    </div>
+                </div>
 
-                <label for="gene-search-right">Search Gene:</label>
-                <input type="text" id="gene-search-right" placeholder="Search gene...">
-                <select id="gene-selector-right" disabled></select>
+                <!-- Second Row: Gene and TSS -->
+                <div class="dropdown-row">
+                    <div class="search-group">
+                        <label for="gene-search-right">Search Gene:</label>
+                        <input type="text" id="gene-search-right" placeholder="Search gene...">
+                        <select id="gene-selector-right" disabled></select>
+                    </div>
 
-                <label for="tss-search-right">Search TSS:</label>
-                <input type="text" id="tss-search-right" placeholder="Search TSS...">
-                <select id="tss-selector-right" disabled></select>
+                    <div class="search-group">
+                        <label for="tss-search-right">Search TSS:</label>
+                        <input type="text" id="tss-search-right" placeholder="Search TSS...">
+                        <select id="tss-selector-right" disabled></select>
+                    </div>
+                </div>
             </div>
             <img id="figure-right" src="" alt="Right Selected Figure">
         </div>
@@ -132,19 +179,13 @@
                 }
             });
 
-            // Ensure update triggers correctly
             selector.addEventListener("change", () => updateFigure(panel));
         }
 
         function populateSpeciesSelector(panel) {
-            const selectorId = `species-selector-${panel}`;
-            const searchId = `species-search-${panel}`;
             const speciesList = Object.keys(figureData);
-
-            if (speciesList.length > 0) {
-                populateSelector(selectorId, searchId, speciesList, panel);
-                populateSampleSelector(panel);
-            }
+            populateSelector(`species-selector-${panel}`, `species-search-${panel}`, speciesList, panel);
+            populateSampleSelector(panel);
         }
 
         function populateSampleSelector(panel) {
@@ -184,13 +225,9 @@
             const tss = document.getElementById(`tss-selector-${panel}`).value;
             const figure = document.getElementById(`figure-${panel}`);
 
-            if (species && sample && gene && tss) {
-                const imagePath = `${baseURL}${species}/${sample}/${gene}/${tss}.png`;
-                console.log(`Generated Image Path (${panel}):`, imagePath);
-                figure.src = imagePath;
-            } else {
-                figure.src = "";
-            }
+            figure.src = species && sample && gene && tss 
+                ? `${baseURL}${species}/${sample}/${gene}/${tss}.png` 
+                : "";
         }
 
         fetchFigures();
