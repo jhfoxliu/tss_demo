@@ -1,35 +1,24 @@
 {
     "Human": {
         "Sample1": {
-            "MethodA": {
-                "GeneA": {
-                    "TSS1": "figures/Human/Sample1/MethodA/GeneA/TSS1.png",
-                    "TSS2": "figures/Human/Sample1/MethodA/GeneA/TSS2.png"
-                },
-                "GeneB": {
-                    "TSS1": "figures/Human/Sample1/MethodA/GeneB/TSS1.png"
-                }
+            "GeneA": {
+                "TSS1": "figures/Human/Sample1/GeneA/TSS1.png",
+                "TSS2": "figures/Human/Sample1/GeneA/TSS2.png"
             },
-            "MethodB": {
-                "GeneA": {
-                    "TSS1": "figures/Human/Sample1/MethodB/GeneA/TSS1.png"
-                }
+            "GeneB": {
+                "TSS1": "figures/Human/Sample1/GeneB/TSS1.png"
             }
         },
         "Sample2": {
-            "MethodA": {
-                "GeneC": {
-                    "TSS1": "figures/Human/Sample2/MethodA/GeneC/TSS1.png"
-                }
+            "GeneC": {
+                "TSS1": "figures/Human/Sample2/GeneC/TSS1.png"
             }
         }
     },
     "Mouse": {
         "Sample3": {
-            "MethodA": {
-                "GeneD": {
-                    "TSS1": "figures/Mouse/Sample3/MethodA/GeneD/TSS1.png"
-                }
+            "GeneD": {
+                "TSS1": "figures/Mouse/Sample3/GeneD/TSS1.png"
             }
         }
     }

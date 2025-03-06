@@ -1,0 +1,36 @@
+{
+    "Human": {
+        "Sample1": {
+            "MethodA": {
+                "GeneA": {
+                    "TSS1": "figures/Human/Sample1/MethodA/GeneA/TSS1.png",
+                    "TSS2": "figures/Human/Sample1/MethodA/GeneA/TSS2.png"
+                },
+                "GeneB": {
+                    "TSS1": "figures/Human/Sample1/MethodA/GeneB/TSS1.png"
+                }
+            },
+            "MethodB": {
+                "GeneA": {
+                    "TSS1": "figures/Human/Sample1/MethodB/GeneA/TSS1.png"
+                }
+            }
+        },
+        "Sample2": {
+            "MethodA": {
+                "GeneC": {
+                    "TSS1": "figures/Human/Sample2/MethodA/GeneC/TSS1.png"
+                }
+            }
+        }
+    },
+    "Mouse": {
+        "Sample3": {
+            "MethodA": {
+                "GeneD": {
+                    "TSS1": "figures/Mouse/Sample3/MethodA/GeneD/TSS1.png"
+                }
+            }
+        }
+    }
+}
