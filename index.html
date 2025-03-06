@@ -20,6 +20,9 @@
             width: 45%;
             text-align: center;
         }
+        .selectors {
+            margin-bottom: 15px;
+        }
         select, input {
             margin: 5px;
             padding: 5px;
@@ -27,8 +30,7 @@
         .dropdown-container {
             position: relative;
             display: inline-block;
-            width: auto;
-            min-width: 200px;
+            width: 250px; /* Fixed width for search box */
         }
         .dropdown-list {
             position: absolute;
@@ -65,38 +67,44 @@
         <!-- Left Panel -->
         <div class="panel">
             <h3>Left Selection</h3>
-            <div class="filters">
+            <div class="selectors">
                 <label for="species-selector-left">Species:</label>
                 <select id="species-selector-left"></select>
 
                 <label for="sample-selector-left">Sample:</label>
                 <select id="sample-selector-left" disabled></select>
+            </div>
 
+            <div class="selectors">
+                <label for="gene-input-left">Gene:TSS</label>
                 <div class="dropdown-container">
-                    <label for="gene-input-left">Gene:TSS</label>
                     <input type="text" id="gene-input-left" placeholder="Type to search..." disabled>
                     <div class="dropdown-list" id="gene-dropdown-left"></div>
                 </div>
             </div>
+
             <img id="figure-left" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Left Selected Figure">
         </div>
 
         <!-- Right Panel -->
         <div class="panel">
             <h3>Right Selection</h3>
-            <div class="filters">
+            <div class="selectors">
                 <label for="species-selector-right">Species:</label>
                 <select id="species-selector-right"></select>
 
                 <label for="sample-selector-right">Sample:</label>
                 <select id="sample-selector-right" disabled></select>
+            </div>
 
+            <div class="selectors">
+                <label for="gene-input-right">Gene:TSS</label>
                 <div class="dropdown-container">
-                    <label for="gene-input-right">Gene:TSS</label>
                     <input type="text" id="gene-input-right" placeholder="Type to search..." disabled>
                     <div class="dropdown-list" id="gene-dropdown-right"></div>
                 </div>
             </div>
+
             <img id="figure-right" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Right Selected Figure">
         </div>
     </div>
@@ -186,9 +194,6 @@
                 });
 
                 dropdown.style.display = dropdown.innerHTML ? "block" : "none";
-
-                // Adjust the width dynamically
-                inputField.style.width = Math.max(...Array.from(dropdown.children).map(el => el.offsetWidth), 200) + "px";
             });
 
             updateFigure(panel);
