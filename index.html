@@ -20,13 +20,31 @@
             width: 45%;
             text-align: center;
         }
-        .search-container {
-            margin-bottom: 10px;
-        }
-        select {
-            width: 80%;
-            padding: 5px;
+        select, input {
             margin: 5px;
+            padding: 5px;
+        }
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .dropdown-list {
+            position: absolute;
+            z-index: 1000;
+            width: 100%;
+            border: 1px solid #ccc;
+            background: white;
+            display: none;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .dropdown-list div {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .dropdown-list div:hover {
+            background-color: #ddd;
         }
         img {
             width: 100%;
@@ -47,46 +65,38 @@
         <div class="panel">
             <h3>Left Selection</h3>
             <div class="filters">
-                <label for="species-search-left">Search Species:</label>
-                <input type="text" id="species-search-left" placeholder="Search species...">
+                <label for="species-selector-left">Species:</label>
                 <select id="species-selector-left"></select>
 
-                <label for="sample-search-left">Search Sample:</label>
-                <input type="text" id="sample-search-left" placeholder="Search sample...">
+                <label for="sample-selector-left">Sample:</label>
                 <select id="sample-selector-left" disabled></select>
 
-                <label for="gene-search-left">Search Gene:</label>
-                <input type="text" id="gene-search-left" placeholder="Search gene...">
-                <select id="gene-selector-left" disabled></select>
-
-                <label for="tss-search-left">Search TSS:</label>
-                <input type="text" id="tss-search-left" placeholder="Search TSS...">
-                <select id="tss-selector-left" disabled></select>
+                <label for="gene-selector-left">Gene:TSS</label>
+                <div class="dropdown-container">
+                    <input type="text" id="gene-input-left" placeholder="Type to search..." disabled>
+                    <div class="dropdown-list" id="gene-dropdown-left"></div>
+                </div>
             </div>
-            <img id="figure-left" src="" alt="Left Selected Figure">
+            <img id="figure-left" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Left Selected Figure">
         </div>
 
         <!-- Right Panel -->
         <div class="panel">
             <h3>Right Selection</h3>
             <div class="filters">
-                <label for="species-search-right">Search Species:</label>
-                <input type="text" id="species-search-right" placeholder="Search species...">
+                <label for="species-selector-right">Species:</label>
                 <select id="species-selector-right"></select>
 
-                <label for="sample-search-right">Search Sample:</label>
-                <input type="text" id="sample-search-right" placeholder="Search sample...">
+                <label for="sample-selector-right">Sample:</label>
                 <select id="sample-selector-right" disabled></select>
 
-                <label for="gene-search-right">Search Gene:</label>
-                <input type="text" id="gene-search-right" placeholder="Search gene...">
-                <select id="gene-selector-right" disabled></select>
-
-                <label for="tss-search-right">Search TSS:</label>
-                <input type="text" id="tss-search-right" placeholder="Search TSS...">
-                <select id="tss-selector-right" disabled></select>
+                <label for="gene-selector-right">Gene:TSS</label>
+                <div class="dropdown-container">
+                    <input type="text" id="gene-input-right" placeholder="Type to search..." disabled>
+                    <div class="dropdown-list" id="gene-dropdown-right"></div>
+                </div>
             </div>
-            <img id="figure-right" src="" alt="Right Selected Figure">
+            <img id="figure-right" src="https://raw.githubusercontent.com/jhfoxliu/tss_demo/refs/heads/main/figures/Human/Sample1/GeneA_TSS1.png" alt="Right Selected Figure">
         </div>
     </div>
 
@@ -94,7 +104,7 @@
         const repoOwner = "jhfoxliu";  
         const repoName = "tss_demo";   
         const jsonURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/figures.json`;
-        const baseURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/refs/heads/main/figures/`;
+        const baseURL = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/refs/heads/main/`;
 
         let figureData = {};
 
@@ -110,39 +120,26 @@
             }
         }
 
-        function populateSelector(selectorId, searchId, options, panel) {
+        function populateSelector(selectorId, options) {
             const selector = document.getElementById(selectorId);
-            selector.innerHTML = '<option value="" disabled selected>Select...</option>';
+            selector.innerHTML = "";
 
-            options.forEach(option => {
+            options.forEach((option, index) => {
                 let opt = document.createElement("option");
                 opt.value = option;
                 opt.textContent = option;
                 selector.appendChild(opt);
+
+                if (index === 0) selector.value = option;
             });
 
             selector.disabled = false;
-
-            // Enable live search filtering
-            document.getElementById(searchId).addEventListener("input", function () {
-                let filter = this.value.toLowerCase();
-                for (let option of selector.options) {
-                    let text = option.textContent.toLowerCase();
-                    option.hidden = filter && !text.includes(filter);
-                }
-            });
-
-            // Ensure update triggers correctly
-            selector.addEventListener("change", () => updateFigure(panel));
         }
 
         function populateSpeciesSelector(panel) {
-            const selectorId = `species-selector-${panel}`;
-            const searchId = `species-search-${panel}`;
             const speciesList = Object.keys(figureData);
-
             if (speciesList.length > 0) {
-                populateSelector(selectorId, searchId, speciesList, panel);
+                populateSelector(`species-selector-${panel}`, speciesList);
                 populateSampleSelector(panel);
             }
         }
@@ -152,8 +149,10 @@
             if (!species) return;
 
             const sampleList = Object.keys(figureData[species]);
-            populateSelector(`sample-selector-${panel}`, `sample-search-${panel}`, sampleList, panel);
-            populateGeneSelector(panel);
+            if (sampleList.length > 0) {
+                populateSelector(`sample-selector-${panel}`, sampleList);
+                populateGeneSelector(panel);
+            }
         }
 
         function populateGeneSelector(panel) {
@@ -162,30 +161,43 @@
             if (!species || !sample) return;
 
             const geneList = Object.keys(figureData[species][sample]);
-            populateSelector(`gene-selector-${panel}`, `gene-search-${panel}`, geneList, panel);
-            populateTSSSelector(panel);
-        }
+            const inputField = document.getElementById(`gene-input-${panel}`);
+            const dropdown = document.getElementById(`gene-dropdown-${panel}`);
 
-        function populateTSSSelector(panel) {
-            const species = document.getElementById(`species-selector-${panel}`).value;
-            const sample = document.getElementById(`sample-selector-${panel}`).value;
-            const gene = document.getElementById(`gene-selector-${panel}`).value;
-            if (!species || !sample || !gene) return;
+            inputField.disabled = false;
+            inputField.value = geneList.length > 0 ? geneList[0] : "";  // Set first Gene:TSS as placeholder
 
-            const tssList = Object.keys(figureData[species][sample][gene]);
-            populateSelector(`tss-selector-${panel}`, `tss-search-${panel}`, tssList, panel);
+            inputField.addEventListener("input", function () {
+                const searchText = inputField.value.toLowerCase();
+                dropdown.innerHTML = "";
+
+                geneList.forEach(geneTSS => {
+                    if (geneTSS.toLowerCase().includes(searchText)) {
+                        const option = document.createElement("div");
+                        option.textContent = geneTSS;
+                        option.addEventListener("click", () => {
+                            inputField.value = geneTSS;
+                            dropdown.style.display = "none";
+                            updateFigure(panel);
+                        });
+                        dropdown.appendChild(option);
+                    }
+                });
+
+                dropdown.style.display = dropdown.innerHTML ? "block" : "none";
+            });
+
             updateFigure(panel);
         }
 
         function updateFigure(panel) {
             const species = document.getElementById(`species-selector-${panel}`).value;
             const sample = document.getElementById(`sample-selector-${panel}`).value;
-            const gene = document.getElementById(`gene-selector-${panel}`).value;
-            const tss = document.getElementById(`tss-selector-${panel}`).value;
+            const geneTSS = document.getElementById(`gene-input-${panel}`).value;
             const figure = document.getElementById(`figure-${panel}`);
 
-            if (species && sample && gene && tss) {
-                const imagePath = `${baseURL}${species}/${sample}/${gene}/${tss}.png`;
+            if (species && sample && geneTSS && figureData[species][sample][geneTSS]) {
+                const imagePath = `${baseURL}${figureData[species][sample][geneTSS]}`;
                 console.log(`Generated Image Path (${panel}):`, imagePath);
                 figure.src = imagePath;
             } else {
